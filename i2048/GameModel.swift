@@ -22,7 +22,7 @@ class GameModel : NSObject {
     unowned var delegate : GameProtocol
     
     var timer : Timer
-    var queue : [Move]
+    var queue : [MoveCommand]
     
     let MAX_COMMANDS = 100
     let QUEUE_DELAY = 0.3
@@ -31,7 +31,7 @@ class GameModel : NSObject {
         self.size = size
         self.threshold = threshold
         self.delegate = d
-        queue = [Move]()
+        queue = [MoveCommand]()
         timer = Timer()
         gameboard = Gameboard(size: size, initialValue: .empty)
         super.init()
@@ -42,6 +42,58 @@ class GameModel : NSObject {
         gameboard.setAll(.empty)
         queue.removeAll(keepingCapacity: true)
         timer.invalidate()
+    }
+    
+    func addMoveToQueue(_ direction : MoveDirection, completion : @escaping (Bool) -> ()) {
+        if queue.count > MAX_COMMANDS {
+            return
+        }
+        queue.append(MoveCommand(direction: direction, completion: completion))
+        if !timer.isValid {
+            timerFired(timer)
+        }
+    }
+    
+    func timerFired(_ : Timer) {
+        if queue.count == 0 {
+            return
+        }
+        var changed = false
+        while queue.count > 0 {
+            let command = queue.remove(at: 0)
+            changed = move(command.direction)
+            command.completion(changed)
+            if changed {
+                break
+            }
+        }
+        
+        if changed {
+            timer = Timer.scheduledTimer(timeInterval: QUEUE_DELAY,
+                                         target: self,
+                                         selector:
+                #selector(GameModel.timerFired(_:)),
+                                         userInfo: nil,
+                                         repeats: false)
+        }
+    }
+    
+    func insertTile(_ position : (Int, Int), value: Int) {
+        let (x, y) = position
+        if case .empty = gameboard[x, y] {
+            gameboard[x, y] = Tile.tile(value)
+            delegate.addTile(position, value: value)
+        }
+    }
+    
+    func insertTileAtRandomLocation(_ value : Int) {
+        let openSpots = gameboard.getEmptySpots()
+        if openSpots.isEmpty {
+            return
+        }
+        let idx = Int(arc4random_uniform(UInt32(openSpots.count - 1)))
+        let (x, y) = openSpots[idx]
+        insertTile((x, y), value: value)
     }
     
     func lost() -> Bool {

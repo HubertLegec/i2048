@@ -2,54 +2,46 @@
 //  GameViewController.swift
 //  i2048
 //
-//  Created by Hubert Legęć on 10.12.2016.
-//  Copyright © 2016 Hubert Legęć. All rights reserved.
+//  Created by Hubert Legęć on 19.01.2017.
+//  Copyright © 2017 Hubert Legęć. All rights reserved.
 //
 
 import UIKit
-import SpriteKit
-import GameplayKit
+import Foundation
 
-class GameViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
+class GameViewController : UIViewController, GameProtocol {
+    
+    var size : Int
+    var threshold : Int
+    
+    var model : GameModel?
+    var board : BoardView?
+    
+    init(size s : Int, threshold t : Int) {
+        super.init(nibName: nil, bundle: nil)
+        size = s
+        threshold = t
+        model = GameModel(size: s, threshold: t, delegate: self)
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        fatalError("NSCoding not supported")
+    }
+    
+    func scoreChanged(_ score: Int) {
+        <#code#>
+    }
+    
+    func addTile(_ position: (Int, Int), value: Int) {
+        <#code#>
+    }
+    
+    func moveOneTile(_ from: (Int, Int), to: (Int, Int), value: Int) {
         
-        if let view = self.view as! SKView? {
-            // Load the SKScene from 'GameScene.sks'
-            if let scene = SKScene(fileNamed: "GameScene") {
-                // Set the scale mode to scale to fit the window
-                scene.scaleMode = .aspectFill
-                
-                // Present the scene
-                view.presentScene(scene)
-            }
-            
-            view.ignoresSiblingOrder = true
-            
-            view.showsFPS = true
-            view.showsNodeCount = true
-        }
     }
-
-    override var shouldAutorotate: Bool {
-        return true
+    
+    func moveTwoTiles(_ from: ((Int, Int), (Int, Int)), to: (Int, Int), value: Int) {
+        <#code#>
     }
-
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            return .allButUpsideDown
-        } else {
-            return .all
-        }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Release any cached data, images, etc that aren't in use.
-    }
-
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
+    
 }

@@ -27,13 +27,13 @@ class GameModel : NSObject {
     let MAX_COMMANDS = 100
     let QUEUE_DELAY = 0.3
     
-    init(size : Int, threshold : Int, delegate d : GameProtocol) {
-        self.size = size
-        self.threshold = threshold
+    init(size s : Int, threshold  t: Int, delegate d : GameProtocol) {
+        self.size = s
+        self.threshold = t
         self.delegate = d
         queue = [MoveCommand]()
         timer = Timer()
-        gameboard = Gameboard(size: size, initialValue: .empty)
+        gameboard = Gameboard(size: s, initialValue: .empty)
         super.init()
     }
     

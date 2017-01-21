@@ -28,6 +28,9 @@ class TileView : UIView {
         addSubview(label)
         layer.cornerRadius = radius
         self.value = value
+        backgroundColor = TileAppearance.backgroundColor(value)
+        label.textColor = TileAppearance.numberColor(value)
+        label.text = "\(value)"
     }
     
     required init(coder: NSCoder) {

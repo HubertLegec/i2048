@@ -15,8 +15,6 @@ class BoardView : UIView {
     var cornerRadius : CGFloat
     var tiles : Dictionary<IndexPath, TileView>
     
-    let tilePopStartScale: CGFloat = 0.1
-    
     init(size s: Int, tileWidth w: CGFloat, tilePadding p: CGFloat, cornerRadius r: CGFloat) {
         size = s
         tileWidth = w
@@ -59,12 +57,12 @@ class BoardView : UIView {
         tiles.removeAll(keepingCapacity: true)
     }
     
-    func add_tile(_ position: (Int, Int), value: Int) {
+    func addTile(_ position: (Int, Int), value: Int) {
         let (row, col) = position
-        let x = tilePadding + CGFloat(col) * (tileWidth + tilePadding)
-        let y = tilePadding + CGFloat(row) * (tileWidth + tilePadding)
+        let x = calculateTilePosition(col)
+        let y = calculateTilePosition(row)
         let tile = TileView(position: CGPoint(x: x, y: y), size: tileWidth, value: value, radius: cornerRadius)
-        tile.layer.setAffineTransform(CGAffineTransform(scaleX: tilePopStartScale, y: tilePopStartScale))
+        tile.layer.setAffineTransform(CGAffineTransform(scaleX: 0.1, y: 0.1))
         
         addSubview(tile)
         bringSubview(toFront: tile)
@@ -82,11 +80,58 @@ class BoardView : UIView {
     }
     
     func moveOneTile(_ from : (Int, Int), to: (Int, Int), value: Int) {
+        let (fromRow, fromCol) = from
+        let (toRow, toCol) = to
+        let fromKey = IndexPath(row: fromRow, section: fromCol)
+        let toKey = IndexPath(row: toRow, section: toCol)
         
+        guard let tile = tiles[fromKey] else {
+            assert(false, "get tile from key error")
+        }
+        
+        var finalFrame = tile.frame
+        finalFrame.origin.x = calculateTilePosition(toCol)
+        finalFrame.origin.y = calculateTilePosition(toRow)
+        
+        tiles.removeValue(forKey: fromKey)
+        tiles[toKey] = tile
+        
+        tile.frame = finalFrame
+        tile.value = value
     }
     
     func moveTwoTiles(_ from: ((Int, Int), (Int, Int)), to: (Int, Int), value: Int) {
+        let (fromRow1, fromCol1) = from.0
+        let (fromRow2, fromCol2) = from.1
+        let (toRow, toCol) = to
+        let fromKey1 = IndexPath(row: fromRow1, section: fromCol1)
+        let fromKey2 = IndexPath(row: fromRow2, section: fromCol2)
+        let toKey = IndexPath(row: toRow, section: toCol)
         
+        guard let tile1 = tiles[fromKey1] else {
+            assert(false, "get tile from key error")
+        }
+        
+        guard let tile2 = tiles[fromKey2] else {
+            assert(false, "get tile from key error")
+        }
+        
+        var finalFrame = tile1.frame
+        let oldTile = tiles[toKey]
+        oldTile?.removeFromSuperview()
+        finalFrame.origin.x = calculateTilePosition(toCol)
+        finalFrame.origin.y = calculateTilePosition(toRow)
+        tiles.removeValue(forKey: fromKey1)
+        tiles.removeValue(forKey: fromKey2)
+        tiles[toKey] = tile1
+        tile1.frame = finalFrame
+        tile2.frame = finalFrame
+        tile1.value = value
+        tile2.removeFromSuperview()
+    }
+    
+    func calculateTilePosition(_ idx: Int) -> CGFloat {
+        return tilePadding + CGFloat(idx) * (tileWidth + tilePadding)
     }
     
 }

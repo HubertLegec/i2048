@@ -6,6 +6,7 @@ class GameViewController : UIViewController {
     var threshold: Int
     var model: GameModel?
     var board: BoardView?
+    var scoreView: ScoreView?
     let viewPadding: CGFloat = 10.0
     
     var boardWidth: CGFloat?
@@ -37,20 +38,30 @@ class GameViewController : UIViewController {
     }
     
     func setupGame() {
+        let score = ScoreView()
+        
         let padding: CGFloat = 6.0
         let v1 = boardWidth! - padding*(CGFloat(size + 1))
         let width: CGFloat = CGFloat(floorf(CFloat(v1)))/CGFloat(size)
-        let gameboard = BoardView(size: size, tileWidth: width, tilePadding: padding)
+        let gameboard = BoardView(size: size, tileSize: width, tilePadding: padding)
         
-        let views = [gameboard]
+        let views = [score, gameboard]
         
         var f = gameboard.frame
         f.origin.x = xPositionToCenterView(gameboard)
-        f.origin.y = yPositionForViewAtPos(0, views)
+        f.origin.y = yPositionForViewAtPos(1, views)
         gameboard.frame = f
+        
+        f = score.frame
+        f.origin.x = xPositionToCenterView(score)
+        f.origin.y = yPositionForViewAtPos(0, views)
+        score.frame = f
         
         view.addSubview(gameboard)
         board = gameboard
+        view.addSubview(score)
+        scoreView = score
+        scoreChanged(0)
         
         model!.insertTileAtRandomLocation(2)
         model!.insertTileAtRandomLocation(2)
@@ -111,7 +122,7 @@ class GameViewController : UIViewController {
     }
     
     func scoreChanged(_ score: Int) {
-        //TODO
+        scoreView!.score = score
     }
     
     func addTile(_ position: (Int, Int), value: Int) {

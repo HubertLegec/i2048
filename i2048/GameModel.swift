@@ -83,8 +83,7 @@ class GameModel : NSObject {
             let coords = generateCoords(iteration: i, direction: moveDirection)
             let tiles = coords.map() {
                 (c : (Int, Int)) -> Tile in
-                let (x, y) = c
-                return self.gameboard[x, y]
+                return self.gameboard[c.0, c.1]
             }
             let orders = merge(tiles)
             atLeastOneMove = orders.count > 0 ? true : atLeastOneMove

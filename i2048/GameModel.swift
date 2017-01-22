@@ -1,17 +1,13 @@
-//
-//  gameModel.swift
-//  i2048
-//
-//  Created by Hubert Legęć on 11.01.2017.
-//  Copyright © 2017 Hubert Legęć. All rights reserved.
-//
 
-import Foundation
+import UIKit
 
 class GameModel : NSObject {
     let size : Int
     let threshold : Int
     var gameboard : Gameboard
+    var timer : Timer
+    var queue : [MoveCommand]
+    unowned var delegate : GameViewController
     
     var score : Int = 0 {
         didSet {
@@ -19,15 +15,7 @@ class GameModel : NSObject {
         }
     }
     
-    unowned var delegate : GameProtocol
-    
-    var timer : Timer
-    var queue : [MoveCommand]
-    
-    let MAX_COMMANDS = 100
-    let QUEUE_DELAY = 0.3
-    
-    init(size s : Int, threshold  t: Int, delegate d : GameProtocol) {
+    init(size s : Int, threshold  t: Int, delegate d : GameViewController) {
         self.size = s
         self.threshold = t
         self.delegate = d
@@ -44,10 +32,7 @@ class GameModel : NSObject {
         timer.invalidate()
     }
     
-    func addMoveToQueue(_ direction : MoveDirection, completion : @escaping (Bool) -> ()) {
-        if queue.count > MAX_COMMANDS {
-            return
-        }
+    func addMoveToQueue(_ direction : UISwipeGestureRecognizerDirection, completion : @escaping (Bool) -> ()) {
         queue.append(MoveCommand(direction: direction, completion: completion))
         if !timer.isValid {
             timerFired(timer)
@@ -55,26 +40,14 @@ class GameModel : NSObject {
     }
     
     func timerFired(_ : Timer) {
-        if queue.count == 0 {
-            return
-        }
         var changed = false
-        while queue.count > 0 {
+        while queue.count > 0 && !changed {
             let command = queue.remove(at: 0)
             changed = move(command.direction)
             command.completion(changed)
-            if changed {
-                break
-            }
         }
-        
         if changed {
-            timer = Timer.scheduledTimer(timeInterval: QUEUE_DELAY,
-                                         target: self,
-                                         selector:
-                #selector(GameModel.timerFired(_:)),
-                                         userInfo: nil,
-                                         repeats: false)
+            timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(GameModel.timerFired(_:)), userInfo: nil, repeats: false)
         }
     }
     
@@ -97,24 +70,14 @@ class GameModel : NSObject {
     }
     
     func lost() -> Bool {
-        guard gameboard.getEmptySpots().isEmpty else {
-            return false
-        }
-        return !gameboard.hasNeighboursWithSameValues()
+        return gameboard.getEmptySpots().isEmpty && !gameboard.hasNeighboursWithSameValues()
     }
     
     func won() -> (Bool, (Int, Int)?) {
-        for i in 0 ..< size {
-            for j in 0 ..< size {
-                if case let .tile(v) = gameboard[i, j], v >= threshold {
-                    return (true, (i, j))
-                }
-            }
-        }
-        return (false, nil)
+        return gameboard.hasTileWithValueGreaterThan(threshold)
     }
     
-    func move(_ moveDirection : MoveDirection) -> Bool {
+    func move(_ moveDirection : UISwipeGestureRecognizerDirection) -> Bool {
         var atLeastOneMove = false
         for i in 0 ..< self.size {
             let coords = generateCoords(iteration: i, direction: moveDirection)
@@ -151,18 +114,20 @@ class GameModel : NSObject {
         return atLeastOneMove
     }
     
-    func generateCoords(iteration : Int, direction : MoveDirection) -> [(Int, Int)] {
+    func generateCoords(iteration : Int, direction : UISwipeGestureRecognizerDirection) -> [(Int, Int)] {
         var buffer = Array<(Int, Int)>(repeating: (0, 0), count: self.size)
         for i in 0 ..< self.size {
             switch direction {
-            case .up :
+            case UISwipeGestureRecognizerDirection.up :
                 buffer[i] = (i, iteration)
-            case .down :
+            case UISwipeGestureRecognizerDirection.down :
                 buffer[i] = (self.size - i - 1, iteration)
-            case .left :
+            case UISwipeGestureRecognizerDirection.left :
                 buffer[i] = (iteration, i)
-            case .right :
+            case UISwipeGestureRecognizerDirection.right :
                 buffer[i] = (iteration, self.size - i - 1)
+            default:
+                assert(false, "Error")
             }
         }
         return buffer
@@ -196,10 +161,6 @@ class GameModel : NSObject {
                 continue
             }
             switch elem {
-            case .singleCombine :
-                    assert(false, "Can't have single combine elem in input")
-            case .doubleCombine :
-                assert(false, "Can't have double combine elem in input")
             case let .noAction(s, v) where (idx < elements.count - 1 && v == elements[idx + 1].getValue()
                 && GameModel.noActionIsUnmoved(idx, buffer.count, s)) :
                 let next = elements[idx + 1]

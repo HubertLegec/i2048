@@ -1,10 +1,3 @@
-//
-//  TileView.swift
-//  i2048
-//
-//  Created by Hubert Legęć on 19.01.2017.
-//  Copyright © 2017 Hubert Legęć. All rights reserved.
-//
 
 import UIKit
 

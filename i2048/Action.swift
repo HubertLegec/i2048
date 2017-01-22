@@ -1,12 +1,3 @@
-//
-//  Action.swift
-//  i2048
-//
-//  Created by Hubert Legęć on 12.01.2017.
-//  Copyright © 2017 Hubert Legęć. All rights reserved.
-//
-
-import Foundation
 
 enum Action {
     case noAction(source : Int, value : Int)

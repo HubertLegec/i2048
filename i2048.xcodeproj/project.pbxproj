@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B46A16F51E26E55100D92AED /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16F41E26E55100D92AED /* GameModel.swift */; };
-		B46A16F81E26E6B800D92AED /* ModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16F71E26E6B800D92AED /* ModelProtocol.swift */; };
-		B46A16FA1E26E89F00D92AED /* MoveDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16F91E26E89F00D92AED /* MoveDirection.swift */; };
 		B46A16FC1E26E92600D92AED /* MoveCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16FB1E26E92600D92AED /* MoveCommand.swift */; };
 		B46A16FE1E26E9BD00D92AED /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16FD1E26E9BD00D92AED /* Tile.swift */; };
 		B46A17001E26EA5100D92AED /* Gameboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16FF1E26EA5100D92AED /* Gameboard.swift */; };
@@ -47,8 +45,6 @@
 
 /* Begin PBXFileReference section */
 		B46A16F41E26E55100D92AED /* GameModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
-		B46A16F71E26E6B800D92AED /* ModelProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelProtocol.swift; sourceTree = "<group>"; };
-		B46A16F91E26E89F00D92AED /* MoveDirection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveDirection.swift; sourceTree = "<group>"; };
 		B46A16FB1E26E92600D92AED /* MoveCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveCommand.swift; sourceTree = "<group>"; };
 		B46A16FD1E26E9BD00D92AED /* Tile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
 		B46A16FF1E26EA5100D92AED /* Gameboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gameboard.swift; sourceTree = "<group>"; };
@@ -102,8 +98,6 @@
 			isa = PBXGroup;
 			children = (
 				B46A16F41E26E55100D92AED /* GameModel.swift */,
-				B46A16F71E26E6B800D92AED /* ModelProtocol.swift */,
-				B46A16F91E26E89F00D92AED /* MoveDirection.swift */,
 				B46A16FB1E26E92600D92AED /* MoveCommand.swift */,
 				B46A16FD1E26E9BD00D92AED /* Tile.swift */,
 				B46A16FF1E26EA5100D92AED /* Gameboard.swift */,
@@ -311,7 +305,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B46A16FA1E26E89F00D92AED /* MoveDirection.swift in Sources */,
 				B46A16FC1E26E92600D92AED /* MoveCommand.swift in Sources */,
 				B4C602811E316EF600F32271 /* TileView.swift in Sources */,
 				B46A17021E26F54600D92AED /* Action.swift in Sources */,
@@ -319,7 +312,6 @@
 				B4C602841E31737800F32271 /* TileAppearance.swift in Sources */,
 				B46A16FE1E26E9BD00D92AED /* Tile.swift in Sources */,
 				B46A16F51E26E55100D92AED /* GameModel.swift in Sources */,
-				B46A16F81E26E6B800D92AED /* ModelProtocol.swift in Sources */,
 				B4A400E01DFC359A002BF6B9 /* GameMenuController.swift in Sources */,
 				B4A400D81DFC359A002BF6B9 /* AppDelegate.swift in Sources */,
 				B4C6027F1E316C7600F32271 /* BoardView.swift in Sources */,

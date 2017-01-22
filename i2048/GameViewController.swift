@@ -1,26 +1,14 @@
-//
-//  GameViewController.swift
-//  i2048
-//
-//  Created by Hubert Legęć on 19.01.2017.
-//  Copyright © 2017 Hubert Legęć. All rights reserved.
-//
 
 import UIKit
-import Foundation
 
-class GameViewController : UIViewController, GameProtocol {
-    
+class GameViewController : UIViewController {
     var size: Int
     var threshold: Int
-    
     var model: GameModel?
     var board: BoardView?
-    
-    let verticalViewOffset: CGFloat = 0.0
     let viewPadding: CGFloat = 10.0
     
-    let boardWidth: CGFloat = 300.0
+    var boardWidth: CGFloat?
     
     init(size s : Int, threshold tr : Int) {
         self.size = s
@@ -37,6 +25,7 @@ class GameViewController : UIViewController, GameProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        boardWidth = view.bounds.size.width - 2 * viewPadding
         setupGame()
     }
     
@@ -48,13 +37,10 @@ class GameViewController : UIViewController, GameProtocol {
     }
     
     func setupGame() {
-        // Create the score view
-        
-        // Create the gameboard
         let padding: CGFloat = 6.0
-        let v1 = boardWidth - padding*(CGFloat(size + 1))
+        let v1 = boardWidth! - padding*(CGFloat(size + 1))
         let width: CGFloat = CGFloat(floorf(CFloat(v1)))/CGFloat(size)
-        let gameboard = BoardView(size: size, tileWidth: width, tilePadding: padding, cornerRadius: 6)
+        let gameboard = BoardView(size: size, tileWidth: width, tilePadding: padding)
         
         let views = [gameboard]
         
@@ -78,7 +64,7 @@ class GameViewController : UIViewController, GameProtocol {
     
     func yPositionForViewAtPos(_ pos : Int, _ views : [UIView]) -> CGFloat {
         let screenHeight = view.bounds.size.height
-        let totalHeight = CGFloat(views.count - 1) * viewPadding + views.map({ $0.bounds.size.height }).reduce(verticalViewOffset, { $0 + $1 })
+        let totalHeight = CGFloat(views.count - 1) * viewPadding + views.map({ $0.bounds.size.height }).reduce(0.0, { $0 + $1 })
         let viewsTop = 0.5*(screenHeight - totalHeight) >= 0 ? 0.5*(screenHeight - totalHeight) : 0
         
         var acc: CGFloat = 0
@@ -99,43 +85,29 @@ class GameViewController : UIViewController, GameProtocol {
     
     @objc(handleSwipe:)
     func handleSwipe(_ sender: UISwipeGestureRecognizer) {
-        var dir: MoveDirection?
-        switch sender.direction {
-        case UISwipeGestureRecognizerDirection.up:
-            dir = .up
-        case UISwipeGestureRecognizerDirection.down:
-            dir = .down
-        case UISwipeGestureRecognizerDirection.left:
-            dir = .left
-        case UISwipeGestureRecognizerDirection.right:
-            dir = .right
-        default:
-            assert(false, "unknown move")
-        }
-        self.model!.addMoveToQueue(dir!, completion: { (changed: Bool) -> () in
+        self.model!.addMoveToQueue(sender.direction, completion: { (changed: Bool) -> () in
         if changed {
-            self.followUp()
+            let (userWon, _) = self.model!.won()
+            if userWon {
+                let alertView = UIAlertView()
+                alertView.title = "Success"
+                alertView.message = "You won!"
+                alertView.addButton(withTitle: "Cancel")
+                alertView.show()
+            }
+            
+            let randVal = Int(arc4random_uniform(10))
+            self.model!.insertTileAtRandomLocation(randVal == 1 ? 4 : 2)
+            
+            if self.model!.lost() {
+                let alertView = UIAlertView()
+                alertView.title = "Game Over"
+                alertView.message = "You lost..."
+                alertView.addButton(withTitle: "Cancel")
+                alertView.show()
+            }
         }
         })
-    }
-
-    func followUp() {
-        let (userWon, _) = model!.won()
-        if userWon {
-            let alertView = UIAlertController(title: "Victory", message: "You won!", preferredStyle: UIAlertControllerStyle.alert)
-            alertView.show(self, sender: nil)
-        }
-        
-        let randVal = Int(arc4random_uniform(10))
-        model!.insertTileAtRandomLocation(randVal == 1 ? 4 : 2)
-        
-        if model!.lost() {
-            let alertView = UIAlertView()
-            alertView.title = "Game Over"
-            alertView.message = "You lost..."
-            alertView.addButton(withTitle: "Cancel")
-            alertView.show()
-        }
     }
     
     func scoreChanged(_ score: Int) {
@@ -143,7 +115,7 @@ class GameViewController : UIViewController, GameProtocol {
     }
     
     func addTile(_ position: (Int, Int), value: Int) {
-        board!.addTile(position, value: value)
+        board!.insertTile(position, value: value)
     }
     
     func moveOneTile(_ from: (Int, Int), to: (Int, Int), value: Int) {

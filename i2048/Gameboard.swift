@@ -1,13 +1,3 @@
-//
-//  Gameboard.swift
-//  i2048
-//
-//  Created by Hubert Legęć on 11.01.2017.
-//  Copyright © 2017 Hubert Legęć. All rights reserved.
-//
-
-import Foundation
-
 
 class Gameboard {
     let size : Int
@@ -20,13 +10,9 @@ class Gameboard {
     
     subscript(row : Int, column : Int) -> Tile {
         get {
-            assert(row >= 0 && row < size)
-            assert(column >= 0 && column < size)
             return board[row * size + column]
         }
         set {
-            assert(row >= 0 && row < size)
-            assert(column >= 0 && column < size)
             board[row * size + column] = newValue
         }
     }
@@ -51,35 +37,51 @@ class Gameboard {
         return buffer
     }
     
+    func hasTileWithValueGreaterThan(_ threshold: Int) -> (Bool, (Int, Int)?) {
+        for i in 0 ..< size {
+            for j in 0 ..< size {
+                if case let .tile(v) = self[i, j], v >= threshold {
+                    return (true, (i, j))
+                }
+            }
+        }
+        return (false, nil)
+    }
+    
     func hasNeighboursWithSameValues() -> Bool {
         for i in 0 ..< size {
             for j in 0 ..< size {
-                if (tileBelowHasSameValue((i , j)) || tileToRightHasSameValue((i, j))) {
-                    return true
+                switch self[i, j] {
+                case .empty:
+                    assert(false, "Gameboard inconsistency")
+                case let .tile(v):
+                    if tileBelowHasSameValue((i, j), v) || tileToRightHasSameValue((i, j), v) {
+                        return true
+                    }
                 }
             }
         }
         return false
     }
     
-    private func tileBelowHasSameValue(_ location : (Int, Int)) -> Bool {
+    private func tileBelowHasSameValue(_ location : (Int, Int), _ value : Int) -> Bool {
         let (x, y) = location
         guard y != size - 1 else {
             return false
         }
         if case let .tile(v) = self[x, y+1] {
-            return v == self[x, y].get()
+            return v == value
         }
         return false
     }
     
-    private func tileToRightHasSameValue(_ location : (Int, Int)) -> Bool {
+    private func tileToRightHasSameValue(_ location : (Int, Int), _ value : Int) -> Bool {
         let (x, y) = location
         guard x != size - 1 else {
             return false
         }
         if case let .tile(v) = self[x+1, y] {
-            return v == self[x, y].get()
+            return v == value
         }
         return false
     }

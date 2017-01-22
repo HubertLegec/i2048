@@ -30,13 +30,6 @@ class GameViewController : UIViewController {
         setupGame()
     }
     
-    func reset() {
-        board!.reset()
-        model!.reset()
-        model!.insertTileAtRandomLocation(2)
-        model!.insertTileAtRandomLocation(2)
-    }
-    
     func setupGame() {
         let score = ScoreView()
         
@@ -45,21 +38,14 @@ class GameViewController : UIViewController {
         let width: CGFloat = CGFloat(floorf(CFloat(v1)))/CGFloat(size)
         let gameboard = BoardView(size: size, tileSize: width, tilePadding: padding)
         
-        let views = [score, gameboard]
+        let button = ResetButton()
+        button.addTarget(self, action: #selector(handleReset(sender:)), for: .touchUpInside)
         
-        var f = gameboard.frame
-        f.origin.x = xPositionToCenterView(gameboard)
-        f.origin.y = yPositionForViewAtPos(1, views)
-        gameboard.frame = f
-        
-        f = score.frame
-        f.origin.x = xPositionToCenterView(score)
-        f.origin.y = yPositionForViewAtPos(0, views)
-        score.frame = f
-        
-        view.addSubview(gameboard)
+        let views = [score, gameboard, button]
+        adjustViewPosition(gameboard, views: views, idx: 1)
+        adjustViewPosition(score, views: views, idx: 0)
+        adjustViewPosition(button, views: views, idx: 2)
         board = gameboard
-        view.addSubview(score)
         scoreView = score
         scoreChanged(0)
         
@@ -67,17 +53,26 @@ class GameViewController : UIViewController {
         model!.insertTileAtRandomLocation(2)
     }
     
+    func adjustViewPosition(_ view : UIView, views v : [UIView], idx index : Int) {
+        var f = view.frame
+        f.origin.x = xPositionToCenterView(view)
+        f.origin.y = yPositionForViewAtPos(index, v)
+        view.frame  = f
+        self.view.addSubview(view)
+    }
+    
     func xPositionToCenterView(_ v : UIView) -> CGFloat {
         let screenWidth = view.bounds.size.width
         let viewWidth = v.bounds.size.width
-        return 0.5 * (screenWidth - viewWidth) > 0 ? 0.5 * (screenWidth - viewWidth) : 0
+        let deltaWidth = 0.5 * (screenWidth - viewWidth)
+        return deltaWidth > 0 ? deltaWidth : 0
     }
     
     func yPositionForViewAtPos(_ pos : Int, _ views : [UIView]) -> CGFloat {
         let screenHeight = view.bounds.size.height
         let totalHeight = CGFloat(views.count - 1) * viewPadding + views.map({ $0.bounds.size.height }).reduce(0.0, { $0 + $1 })
-        let viewsTop = 0.5*(screenHeight - totalHeight) >= 0 ? 0.5*(screenHeight - totalHeight) : 0
-        
+        let deltaHeight = 0.5 * (screenHeight - totalHeight)
+        let viewsTop = deltaHeight >= 0 ? deltaHeight : 0
         var acc: CGFloat = 0
         for i in 0 ..< pos {
             acc += viewPadding + views[i].bounds.size.height
@@ -100,25 +95,30 @@ class GameViewController : UIViewController {
         if changed {
             let (userWon, _) = self.model!.won()
             if userWon {
-                let alertView = UIAlertView()
-                alertView.title = "Success"
-                alertView.message = "You won!"
-                alertView.addButton(withTitle: "Cancel")
-                alertView.show()
+                let alert = UIAlertController(title: "Success", message: "You won!", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }
             
             let randVal = Int(arc4random_uniform(10))
             self.model!.insertTileAtRandomLocation(randVal == 1 ? 4 : 2)
             
             if self.model!.lost() {
-                let alertView = UIAlertView()
-                alertView.title = "Game Over"
-                alertView.message = "You lost..."
-                alertView.addButton(withTitle: "Cancel")
-                alertView.show()
+                let alert = UIAlertController(title: "Game Over", message: "You lost...", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }
         }
         })
+    }
+    
+    @objc(handleReset:)
+    func handleReset(sender : UIButton!) {
+        board!.reset()
+        model!.reset()
+        scoreView!.score = 0
+        model!.insertTileAtRandomLocation(2)
+        model!.insertTileAtRandomLocation(2)
     }
     
     func scoreChanged(_ score: Int) {

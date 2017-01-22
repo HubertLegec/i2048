@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B437A9AC1E34432B00CA2C31 /* ScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B437A9AB1E34432B00CA2C31 /* ScoreView.swift */; };
+		B437A9AE1E34485200CA2C31 /* ResetButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B437A9AD1E34485200CA2C31 /* ResetButton.swift */; };
 		B46A16F51E26E55100D92AED /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16F41E26E55100D92AED /* GameModel.swift */; };
 		B46A16FC1E26E92600D92AED /* MoveCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16FB1E26E92600D92AED /* MoveCommand.swift */; };
 		B46A16FE1E26E9BD00D92AED /* Tile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46A16FD1E26E9BD00D92AED /* Tile.swift */; };
@@ -46,6 +47,7 @@
 
 /* Begin PBXFileReference section */
 		B437A9AB1E34432B00CA2C31 /* ScoreView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScoreView.swift; sourceTree = "<group>"; };
+		B437A9AD1E34485200CA2C31 /* ResetButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetButton.swift; sourceTree = "<group>"; };
 		B46A16F41E26E55100D92AED /* GameModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
 		B46A16FB1E26E92600D92AED /* MoveCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveCommand.swift; sourceTree = "<group>"; };
 		B46A16FD1E26E9BD00D92AED /* Tile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tile.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				B4C602801E316EF600F32271 /* TileView.swift */,
 				B4C602831E31737800F32271 /* TileAppearance.swift */,
 				B437A9AB1E34432B00CA2C31 /* ScoreView.swift */,
+				B437A9AD1E34485200CA2C31 /* ResetButton.swift */,
 			);
 			name = view;
 			sourceTree = "<group>";
@@ -319,6 +322,7 @@
 				B4A400D81DFC359A002BF6B9 /* AppDelegate.swift in Sources */,
 				B4C6027F1E316C7600F32271 /* BoardView.swift in Sources */,
 				B46A17001E26EA5100D92AED /* Gameboard.swift in Sources */,
+				B437A9AE1E34485200CA2C31 /* ResetButton.swift in Sources */,
 				B437A9AC1E34432B00CA2C31 /* ScoreView.swift in Sources */,
 				B4FD3F671E2A37090036212E /* Move.swift in Sources */,
 			);

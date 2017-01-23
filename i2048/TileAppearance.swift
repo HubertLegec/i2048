@@ -1,6 +1,7 @@
 
 import UIKit
 
+//klasa zawiera metody zwracajęce kolor tła i liczby dla kafelka zależnie od jego wartości
 class TileAppearance {
     
     class func backgroundColor(_ value: Int) -> UIColor {

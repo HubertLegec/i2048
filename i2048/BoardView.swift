@@ -18,8 +18,8 @@ class BoardView : UIView {
         setupBackground()
     }
     
-    required init(coder: NSCoder) {
-        fatalError("NSCoding not supported")
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func reset() {
@@ -29,6 +29,7 @@ class BoardView : UIView {
         tiles.removeAll(keepingCapacity: true)
     }
     
+    //rysowanie planszy
     func setupBackground() {
         backgroundColor = UIColor.darkGray
         var xCursor = tilePadding
@@ -43,6 +44,7 @@ class BoardView : UIView {
         }
     }
     
+    //rysowanie pustego miejsca na kafelek
     func drawTileBackground(xPos x: CGFloat, yPos y: CGFloat) {
         let background = UIView(frame: CGRect(x: x, y: y, width: tileSize, height: tileSize))
         background.layer.cornerRadius = cornerRadius - 2
@@ -61,6 +63,7 @@ class BoardView : UIView {
         bringSubview(toFront: tile)
         tiles[tupleToIndexPath(pos)] = tile
         
+        //animowane powiększanie nowo dodanego kafelka
         UIView.animate(withDuration: 0.15, delay: 0.05,
                        options: UIViewAnimationOptions(),
                        animations: { tile.layer.setAffineTransform(CGAffineTransform(scaleX: 1.1, y: 1.1)) },
@@ -69,6 +72,7 @@ class BoardView : UIView {
         )
     }
     
+    //funkcja wywoływana w przypadku, gdy jeden kafelek przesuwa się na puste miejsce lub na zajęte i wtedy zwięsza swoją wartość
     func moveOneTile(_ from: (Int, Int), to: (Int, Int), value: Int) {
         let (toRow, toCol) = to
         let toKey = IndexPath(row: toRow, section: toCol)
@@ -86,6 +90,7 @@ class BoardView : UIView {
         )
     }
     
+    //funkcja wywoływana gdy dwa kafelki o takiej samej wartości przesuwają się jednocześnie w jedno miejsce i w efekcie powstaje jeden o wartości ich sumy
     func moveTwoTiles(_ from: ((Int, Int), (Int, Int)), to: (Int, Int), value: Int) {
         let (toRow, toCol) = to
         let toKey = IndexPath(row: toRow, section: toCol)

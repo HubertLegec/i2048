@@ -22,7 +22,8 @@ class ScoreView : UIView {
         self.addSubview(label)
     }
     
-    required init(coder aDecoder: NSCoder) {
-        fatalError("NSCoding not supported")
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
+
 }

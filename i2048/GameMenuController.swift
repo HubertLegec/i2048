@@ -24,7 +24,7 @@ class GameMenuController: UIViewController {
     }
 
     @IBAction func startGameTapped(_ sender: Any) {
-        let game = GameViewController(size: boardSizeSelector.selectedSegmentIndex + 3, threshold: 2048)
+        let game = GameViewController(size: boardSizeSelector.selectedSegmentIndex + 3)
         self.present(game, animated: true, completion: nil)
     }
     

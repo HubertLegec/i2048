@@ -3,7 +3,6 @@ import UIKit
 
 class GameViewController : UIViewController {
     var size: Int
-    var threshold: Int
     var model: GameModel?
     var board: BoardView?
     var scoreView: ScoreView?
@@ -11,17 +10,16 @@ class GameViewController : UIViewController {
     
     var boardWidth: CGFloat?
     
-    init(size s : Int, threshold tr : Int) {
+    init(size s : Int) {
         self.size = s
-        self.threshold = tr
         super.init(nibName: nil, bundle: nil)
-        model = GameModel(size: s, threshold: tr, delegate: self)
+        model = GameModel(size: s, delegate: self)
         view.backgroundColor = UIColor.white
         setupSwipes()
     }
     
-    required init(coder aDecoder: NSCoder) {
-        fatalError("NSCoding not supported")
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -30,6 +28,7 @@ class GameViewController : UIViewController {
         setupGame()
     }
     
+    //metoda wywoływana po załadowaniu widoku, dodaje elementy do sceny i ustawia ich pozycje
     func setupGame() {
         let score = ScoreView()
         
@@ -53,6 +52,7 @@ class GameViewController : UIViewController {
         model!.insertTileAtRandomLocation(2)
     }
     
+    //metoda ustawiająca pozycję elementu na ekranie, tak aby wszystkie były wyśrodkowane
     func adjustViewPosition(_ view : UIView, views v : [UIView], idx index : Int) {
         var f = view.frame
         f.origin.x = xPositionToCenterView(view)
@@ -61,6 +61,7 @@ class GameViewController : UIViewController {
         self.view.addSubview(view)
     }
     
+    //metoda wyśrodkowująca element horyzontalnie
     func xPositionToCenterView(_ v : UIView) -> CGFloat {
         let screenWidth = view.bounds.size.width
         let viewWidth = v.bounds.size.width
@@ -68,6 +69,7 @@ class GameViewController : UIViewController {
         return deltaWidth > 0 ? deltaWidth : 0
     }
     
+    //metoda ustawia pozycję wertykalną elementu, tak aby nie nachodził na żadne pozostałe oraz żeby wszystkie były wyśrodkowane
     func yPositionForViewAtPos(_ pos : Int, _ views : [UIView]) -> CGFloat {
         let screenHeight = view.bounds.size.height
         let totalHeight = CGFloat(views.count - 1) * viewPadding + views.map({ $0.bounds.size.height }).reduce(0.0, { $0 + $1 })
@@ -80,6 +82,7 @@ class GameViewController : UIViewController {
         return viewsTop + acc
     }
     
+    //dodanie hadlera do obsługi gestów przesuwania po ekranie
     func setupSwipes() {
         let directions: [UISwipeGestureRecognizerDirection] = [.up, .down, .left, .right]
         for direction in directions {
@@ -89,11 +92,12 @@ class GameViewController : UIViewController {
         }
     }
     
+    //obługa zdarzenia przesuwania palcem po ekranie w różnych kierunkach
     @objc(handleSwipe:)
     func handleSwipe(_ sender: UISwipeGestureRecognizer) {
         self.model!.addMoveToQueue(sender.direction, completion: { (changed: Bool) -> () in
         if changed {
-            let (userWon, _) = self.model!.won()
+            let userWon = self.model!.won()
             if userWon {
                 let alert = UIAlertController(title: "Success", message: "You won!", preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
@@ -112,6 +116,7 @@ class GameViewController : UIViewController {
         })
     }
     
+    //obsługa naciśnięcia przycisku restartu gry
     @objc(handleReset:)
     func handleReset(sender : UIButton!) {
         board!.reset()

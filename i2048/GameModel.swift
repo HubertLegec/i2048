@@ -3,7 +3,6 @@ import UIKit
 
 class GameModel : NSObject {
     let size : Int
-    let threshold : Int
     var gameboard : Gameboard
     var timer : Timer
     var queue : [MoveCommand]
@@ -15,9 +14,8 @@ class GameModel : NSObject {
         }
     }
     
-    init(size s : Int, threshold  t: Int, delegate d : GameViewController) {
+    init(size s : Int, delegate d : GameViewController) {
         self.size = s
-        self.threshold = t
         self.delegate = d
         queue = [MoveCommand]()
         timer = Timer()
@@ -32,6 +30,7 @@ class GameModel : NSObject {
         timer.invalidate()
     }
     
+    //funkcja kolejkuje zdarzenie przesunięcia po ekranie w określonym kierunku, jeśli timer nie działa, to odpala go
     func addMoveToQueue(_ direction : UISwipeGestureRecognizerDirection, completion : @escaping (Bool) -> ()) {
         queue.append(MoveCommand(direction: direction, completion: completion))
         if !timer.isValid {
@@ -39,6 +38,8 @@ class GameModel : NSObject {
         }
     }
     
+    //funkcja uruchamiana po wyzwoleniu timera, pobiera z kolejki kolejne zdarzenia dopóki któreś nie spowoduje zmiany stanu planszy
+    //jeśli nastąpiła zmiana stanu planszy, to to ustawia timer, żeby uruchomił się za chwilę ponownie
     func timerFired(_ : Timer) {
         var changed = false
         while queue.count > 0 && !changed {
@@ -51,6 +52,7 @@ class GameModel : NSObject {
         }
     }
     
+    //dodanie nowego kafelka do planszy
     func insertTile(_ position : (Int, Int), value: Int) {
         let (x, y) = position
         if case .empty = gameboard[x, y] {
@@ -59,6 +61,8 @@ class GameModel : NSObject {
         }
     }
     
+    //wstawia nowy kafelek o zadanej wartości na losowo wybranej z dostępnych pozycji
+    //jeśli żadna pozycja nie jest wolna, nic się nie dzieje
     func insertTileAtRandomLocation(_ value : Int) {
         let openSpots = gameboard.getEmptySpots()
         if openSpots.isEmpty {
@@ -69,14 +73,18 @@ class GameModel : NSObject {
         insertTile((x, y), value: value)
     }
     
+    //sprawdzenie czy użytkownik przegrał
+    //najpierw sprawdzona zostaje dostępność wolnych miejsc na planszy a następnie możliwość połączenia kafelków o tej samej wartości
     func lost() -> Bool {
         return gameboard.getEmptySpots().isEmpty && !gameboard.hasNeighboursWithSameValues()
     }
     
-    func won() -> (Bool, (Int, Int)?) {
-        return gameboard.hasTileWithValueGreaterThan(threshold)
+    //sprawdzenie czy użytkownik wygrał, sprowadza się do sprawdzenia czy na planszy występuje kafelek o wartości 2048
+    func won() -> Bool {
+        return gameboard.hasTileWithValue(2048).0
     }
     
+    //przetwarza pojedynczy gest użytkownika
     func move(_ moveDirection : UISwipeGestureRecognizerDirection) -> Bool {
         var atLeastOneMove = false
         for i in 0 ..< self.size {
@@ -113,6 +121,7 @@ class GameModel : NSObject {
         return atLeastOneMove
     }
     
+    //zależnie od kierunku ruchu tworzy listę wszystkich kafelków w wierszu lub kolumnie, które powinny zostać przesunięte ustawiając je w odpowiedniej kolejności
     func generateCoords(iteration : Int, direction : UISwipeGestureRecognizerDirection) -> [(Int, Int)] {
         var buffer = Array<(Int, Int)>(repeating: (0, 0), count: self.size)
         for i in 0 ..< self.size {
@@ -136,6 +145,7 @@ class GameModel : NSObject {
         return convertActionsToMoves(joinELements(removeEmptySpace(tiles)))
     }
     
+    //usuwa z listy podanej jako argument puste kafelki jednocześnie pozostawionym przypisuje potrzebną do wykonania akcję jeśli trzeba je przesunąć
     func removeEmptySpace(_ tiles : [Tile]) -> [Action] {
         var buffer = [Action]()
         for (idx, tile) in tiles.enumerated() {
@@ -151,6 +161,8 @@ class GameModel : NSObject {
         return buffer
     }
     
+    //dokonuje scalenia elementów stojących na liście obok siebie i mających taką samą wartość
+    //każdy kafelek w jednym ruchu może wziąć udział tylko w jednym scalaniu
     func joinELements(_ elements : [Action]) -> [Action] {
         var buffer = [Action]()
         var skipNext = false
@@ -184,6 +196,7 @@ class GameModel : NSObject {
         return buffer
     }
     
+    //metoda ta zamienia tokeny opisujące akcje do wykoania na konkretne ruchy przesłane do kontrolera widoku
     func convertActionsToMoves(_ actions : [Action]) -> [Move] {
         var buffer = [Move]()
         for (idx, a) in actions.enumerated() {
@@ -201,6 +214,7 @@ class GameModel : NSObject {
         return buffer
     }
     
+    //sprawdza czy token 'NoAction' wciąż przedstawia nieprzesunięty kafelek
     class func noActionIsUnmoved(_ inputPosition : Int, _ outputLength : Int, _ originalPosition : Int) -> Bool {
         return (inputPosition == originalPosition) && (inputPosition == outputLength)
     }

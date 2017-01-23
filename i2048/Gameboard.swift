@@ -8,6 +8,7 @@ class Gameboard {
         board = [Tile](repeating: initialValue, count : s*s)
     }
     
+    //umożliwia dostęp do komórek tablicy reprezentującej planszę za pomocą indeksu wiersza i kolumny
     subscript(row : Int, column : Int) -> Tile {
         get {
             return board[row * size + column]
@@ -37,10 +38,10 @@ class Gameboard {
         return buffer
     }
     
-    func hasTileWithValueGreaterThan(_ threshold: Int) -> (Bool, (Int, Int)?) {
+    func hasTileWithValue(_ threshold: Int) -> (Bool, (Int, Int)?) {
         for i in 0 ..< size {
             for j in 0 ..< size {
-                if case let .tile(v) = self[i, j], v >= threshold {
+                if case let .tile(v) = self[i, j], v == threshold {
                     return (true, (i, j))
                 }
             }
@@ -48,6 +49,7 @@ class Gameboard {
         return (false, nil)
     }
     
+    //metoda sprawdza czy w tablicy występują obok siebie kafelki z takimi samymi wartościami, co oznacza że możliwe są jeszcze ruchy
     func hasNeighboursWithSameValues() -> Bool {
         for i in 0 ..< size {
             for j in 0 ..< size {
